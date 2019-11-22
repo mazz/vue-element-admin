@@ -1,11 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
+      <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
@@ -35,60 +32,51 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="Ordinal" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+          <span>{{ row.ordinal }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Date" width="150px" align="center">
+      <el-table-column label="Updated At" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.updatedAt | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Title" min-width="150px">
+      <el-table-column label="Localized Name" min-width="200px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.localizedname }}</span>
+          <el-tag>{{ row.mediaCategory | typeFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
+      <el-table-column label="Language ID" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
+          <span>{{ row.languageId }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
+      <el-table-column label="Hash ID" width="110px" align="center">
         <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
+          <span>{{ row.hashId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Imp" width="80px">
+      <el-table-column label="Small Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" />
+          <span class="link-type" @click="handleUpdate(row)">{{ row.smallThumbnailPath }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Readings" align="center" width="95">
+      <el-table-column label="Med Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.medThumbnailPath }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
+      <el-table-column label="Large Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.largeThumbnailPath }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
-          </el-button>
-          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            Publish
-          </el-button>
-          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
           </el-button>
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
             Delete
@@ -101,27 +89,31 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="Type" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
+        <el-form-item label="Ordinal" prop="ordinal">
+          <el-input v-model="temp.ordinal" />
+        </el-form-item>
+        <el-form-item label="Media Category" prop="mediaCategory">
+          <el-select v-model="temp.mediaCategory" class="filter-item" placeholder="Please select">
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="Date" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
+          <el-date-picker v-model="temp.updatedAt" type="datetime" placeholder="Please pick a date" />
         </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
+        <el-form-item label="Localized Name" prop="localizedname">
+          <el-input v-model="temp.localizedname" />
         </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+        <el-form-item label="Language ID" prop="languageId">
+          <el-input v-model="temp.languageId" />
         </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
+        <el-form-item label="Small Thumbnail Path" prop="smallThumbnailPath">
+          <el-input v-model="temp.smallThumbnailPath" />
         </el-form-item>
-        <el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        <el-form-item label="Medium Thumbnail Path" prop="medThumbnailPath">
+          <el-input v-model="temp.medThumbnailPath" />
+        </el-form-item>
+        <el-form-item label="Large Thumbnail Path" prop="largeThumbnailPath">
+          <el-input v-model="temp.largeThumbnailPath" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -147,16 +139,25 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
+  { key: 'bible', display_name: 'Bible' },
+  { key: 'gospel', display_name: 'Gospel' },
+  { key: 'livestream', display_name: 'Livestream' },
+  { key: 'motivation', display_name: 'Motivation' },
+  { key: 'movie', display_name: 'Movie' },
+  { key: 'music', display_name: 'Music' },
+  { key: 'podcast', display_name: 'Podcast' },
+  { key: 'preaching', display_name: 'Preaching' },
+  { key: 'testimony', display_name: 'Testimony' },
+  { key: 'tutorial', display_name: 'Tutorial' },
+  { key: 'conference', display_name: 'Conference' },
+  { key: 'audiobook', display_name: 'Audiobook' }
 ]
 
 // arr to obj, such as { CN : "China", US : "USA" }
@@ -219,9 +220,11 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        ordinal: [{ required: true, message: 'ordinal is required', trigger: 'blur' }],
+        mediaCategory: [{ required: true, message: 'media category is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        localizedname: [{ required: true, message: 'title is required', trigger: 'blur' }],
+        languageId: [{ required: true, message: 'language id is required', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -232,15 +235,23 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      return axios.get(`http://localhost:4000/api/v1.3/channels/76202fe0-6923-4ac4-983c-94ac1892dc16/playlists?language-id=en&offset=1&limit=50`)
+        .then(response => {
+          console.log(response)
+                this.listLoading = false
+                this.list = response.data.result
+                this.total = response.data.totalEntries
+        })
 
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+      // fetchList(this.listQuery).then(response => {
+      //   this.list = response.data.items
+      //   this.total = response.data.total
+
+      //   // Just to simulate the time of the request
+      //   setTimeout(() => {
+      //     this.listLoading = false
+      //   }, 1.5 * 1000)
+      // })
     },
     handleFilter() {
       this.listQuery.page = 1
