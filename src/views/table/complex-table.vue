@@ -238,9 +238,9 @@ export default {
       return axios.get(`http://localhost:4000/api/v1.3/channels/76202fe0-6923-4ac4-983c-94ac1892dc16/playlists?language-id=en&offset=1&limit=50`)
         .then(response => {
           console.log(response)
-                this.listLoading = false
-                this.list = response.data.result
-                this.total = response.data.totalEntries
+          this.listLoading = false
+          this.list = response.data.result
+          this.total = response.data.totalEntries
         })
 
       // fetchList(this.listQuery).then(response => {
