@@ -35,7 +35,7 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="Ordinal" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="Ordinal" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('ordinal')">
         <template slot-scope="{row}">
           <span>{{ row.ordinal }}</span>
         </template>
@@ -219,12 +219,12 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: '+ordinal'
       },
       importanceOptions: [1, 2, 3],
       channelOptions,
       calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
+      sortOptions: [{ label: 'Ordinal Ascending', key: '+ordinal' }, { label: 'Ordinal Descending', key: '-ordinal' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -291,15 +291,15 @@ export default {
     },
     sortChange(data) {
       const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      if (prop === 'ordinal') {
+        this.sortByOrdinal(order)
       }
     },
-    sortByID(order) {
+    sortByOrdinal(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = '+ordinal'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = '-ordinal'
       }
       this.handleFilter()
     },
