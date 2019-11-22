@@ -153,7 +153,6 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-
 const channelOptions = [
   { key: 'bible-uuid', display_name: 'Bible Channel' },
   { key: 'gospel-uuid', display_name: 'Gospel Channel' },
