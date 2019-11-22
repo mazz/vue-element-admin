@@ -1,6 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
+      <el-select v-model="listQuery.channel" placeholder="Channel" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in channelOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      </el-select>
       <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
@@ -89,6 +92,11 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="Channel" prop="channel">
+          <el-select v-model="temp.channelUuid" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in channelOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
           <el-input v-model="temp.ordinal" />
         </el-form-item>
@@ -145,6 +153,20 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+
+const channelOptions = [
+  { key: 'bible-uuid', display_name: 'Bible Channel' },
+  { key: 'gospel-uuid', display_name: 'Gospel Channel' },
+  { key: 'preaching-uuid', display_name: 'Preaching Channel' },
+  { key: 'musid-uuid', display_name: 'Music Channel' },
+  { key: 'movies-uuid', display_name: 'Movies Channel' }
+]
+
+const channelOptionsKeyValue = channelOptions.reduce((acc, cur) => {
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
+
 const calendarTypeOptions = [
   { key: 'bible', display_name: 'Bible' },
   { key: 'gospel', display_name: 'Gospel' },
@@ -181,6 +203,9 @@ export default {
     },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
+    },
+    channelFilter(option) {
+      return channelOptionsKeyValue[option]
     }
   },
   data() {
@@ -198,6 +223,7 @@ export default {
         sort: '+id'
       },
       importanceOptions: [1, 2, 3],
+      channelOptions,
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
