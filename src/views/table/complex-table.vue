@@ -311,7 +311,7 @@ export default {
       if (channelUuid != null) {
         this.getList(channelUuid)
         this.$message({
-          message: 'Switch Size Success',
+          message: 'Switch Channel Success',
           type: 'success'
         })
       }
