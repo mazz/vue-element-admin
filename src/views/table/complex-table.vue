@@ -1,40 +1,40 @@
 <template>
   <div class="app-container">
-      <el-dropdown trigger="click" @command="handleSetChannel">
-    <div>
-      <el-col :span="4" class="text-center">
-        <router-link class="pan-btn green-btn" to="/table/complex-table">
-          Select Channel
-        </router-link>
-      </el-col>
-    </div>
-    <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item  v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid"  :command="item.uuid">
-        {{
-          item.basename }}
-      </el-dropdown-item>
-    </el-dropdown-menu>
-  </el-dropdown>
+    <el-dropdown trigger="click" @command="handleSetChannel">
+      <div>
+        <el-col :span="4" class="text-center">
+          <router-link class="pan-btn green-btn" to="/table/complex-table">
+            Select Channel
+          </router-link>
+        </el-col>
+      </div>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" :command="item.uuid">
+          {{
+            item.basename }}
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
 
     <div class="filter-container">
       <!-- <el-select v-model="listQuery.channel" placeholder="Channel" clearable class="filter-item" style="width: 130px"> -->
-        <!-- <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" /> -->
+      <!-- <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" /> -->
       <!-- </el-select> -->
       <!-- <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
       <!-- <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px"> -->
-        <!-- <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" /> -->
+      <!-- <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" /> -->
       <!-- </el-select> -->
       <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter"> -->
-        <!-- <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" /> -->
+      <!-- <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" /> -->
       <!-- </el-select> -->
       <!-- <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"> -->
-        <!-- Search -->
+      <!-- Search -->
       <!-- </el-button> -->
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Add
       </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload"> -->
-        <!-- Export -->
+      <!-- Export -->
       <!-- </el-button> -->
     </div>
 
@@ -95,7 +95,7 @@
             Edit
           </el-button>
           <!-- <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')"> -->
-            <!-- Delete -->
+          <!-- Delete -->
           <!-- </el-button> -->
         </template>
       </el-table-column>
@@ -107,7 +107,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="Channel" prop="channel">
           <el-select v-model="temp.channel_uuid" class="filter-item" placeholder="Please select">
-        <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
+            <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
           </el-select>
         </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
@@ -265,35 +265,34 @@ export default {
     }
   },
   created() {
-
     var bibleChannelUuid = ''
 
-     axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50', 
-        // { params: { type: 'all', }, }
-        )
-        .then((res) => {
-          console.log('Success Response', res.data);
-          res.data.result.forEach((channel) => {
-            this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, updated_at: channel.updated_at });
-            console.log('this.channels', this.channels);
-            console.log('channel.basename', channel.basename);
-            if(channel.basename == 'Bible') {
-              console.log('found Bible');
-              bibleChannelUuid = channel.uuid
-              this.getList(bibleChannelUuid)
-            }
-          });
+    axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50',
+      // { params: { type: 'all', }, }
+    )
+      .then((res) => {
+        console.log('Success Response', res.data)
+        res.data.result.forEach((channel) => {
+          this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, updated_at: channel.updated_at })
+          console.log('this.channels', this.channels)
+          console.log('channel.basename', channel.basename)
+          if (channel.basename == 'Bible') {
+            console.log('found Bible')
+            bibleChannelUuid = channel.uuid
+            this.getList(bibleChannelUuid)
+          }
         })
-        .catch((err) => {
-          console.log('Error', err);
-        });
-    console.log('bibleChannelUuid', bibleChannelUuid);
+      })
+      .catch((err) => {
+        console.log('Error', err)
+      })
+    console.log('bibleChannelUuid', bibleChannelUuid)
     // this.getList()
   },
   methods: {
     getList(channelUuid) {
-      console.log(`getList: ${channelUuid}`);
-      if(channelUuid != null) {
+      console.log(`getList: ${channelUuid}`)
+      if (channelUuid != null) {
         this.listLoading = true
         return axios.get(`http://localhost:4000/api/v1.3/channels/${channelUuid}/playlists?language-id=en&offset=1&limit=1000`)
           .then(response => {
@@ -303,14 +302,13 @@ export default {
             this.total = response.data.total_entries
           })
       }
-
     },
     handleSetChannel(channelUuid) {
-      console.log(`handleSetChannel: ${channelUuid}`);
+      console.log(`handleSetChannel: ${channelUuid}`)
       // this.$ELEMENT.size = size
       // this.$store.dispatch('app/setSize', size)
       // this.refreshView()
-      if(channelUuid != null) {
+      if (channelUuid != null) {
         this.getList(channelUuid)
         this.$message({
           message: 'Switch Size Success',
