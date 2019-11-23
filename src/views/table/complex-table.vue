@@ -1,28 +1,41 @@
 <template>
   <div class="app-container">
+      <el-dropdown trigger="click" @command="handleSetChannel">
+    <div>
+      <el-col :span="4" class="text-center">
+        <router-link class="pan-btn green-btn" to="/table/complex-table">
+          Select Channel
+        </router-link>
+      </el-col>
+    </div>
+    <el-dropdown-menu slot="dropdown">
+      <el-dropdown-item  v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid"  :command="item.uuid">
+        {{
+          item.basename }}
+      </el-dropdown-item>
+    </el-dropdown-menu>
+  </el-dropdown>
+
     <div class="filter-container">
-      <el-select v-model="listQuery.channel" placeholder="Channel" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in channelOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
-      </el-select>
-      <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
-      </el-select>
-      <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        Search
-      </el-button>
+      <!-- <el-select v-model="listQuery.channel" placeholder="Channel" clearable class="filter-item" style="width: 130px"> -->
+        <!-- <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" /> -->
+      <!-- </el-select> -->
+      <!-- <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
+      <!-- <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px"> -->
+        <!-- <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" /> -->
+      <!-- </el-select> -->
+      <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter"> -->
+        <!-- <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" /> -->
+      <!-- </el-select> -->
+      <!-- <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"> -->
+        <!-- Search -->
+      <!-- </el-button> -->
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Add
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Export
-      </el-button>
-      <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox>
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload"> -->
+        <!-- Export -->
+      <!-- </el-button> -->
     </div>
 
     <el-table
@@ -42,38 +55,38 @@
       </el-table-column>
       <el-table-column label="Updated At" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.updatedAt | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.updated_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Localized Name" min-width="200px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.localizedname }}</span>
-          <el-tag>{{ row.mediaCategory | typeFilter }}</el-tag>
+          <el-tag>{{ row.media_category | typeFilter }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="Language ID" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.languageId }}</span>
+          <span>{{ row.language_id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Hash ID" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.hashId }}</span>
+          <span>{{ row.hash_id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Small Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.smallThumbnailPath }}</span>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.small_thumbnail_path }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Med Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.medThumbnailPath }}</span>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.med_thumbnail_path }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Large Thumbnail Path" min-width="150px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.largeThumbnailPath }}</span>
+          <span class="link-type" @click="handleUpdate(row)">{{ row.large_thumbnail_path }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
@@ -81,47 +94,47 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-            Delete
-          </el-button>
+          <!-- <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')"> -->
+            <!-- Delete -->
+          <!-- </el-button> -->
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" /> -->
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="Channel" prop="channel">
-          <el-select v-model="temp.channelUuid" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in channelOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+          <el-select v-model="temp.channel_uuid" class="filter-item" placeholder="Please select">
+        <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
           </el-select>
         </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
           <el-input v-model="temp.ordinal" />
         </el-form-item>
-        <el-form-item label="Media Category" prop="mediaCategory">
-          <el-select v-model="temp.mediaCategory" class="filter-item" placeholder="Please select">
+        <el-form-item label="Media Category" prop="media_category">
+          <el-select v-model="temp.media_category" class="filter-item" placeholder="Please select">
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker v-model="temp.updatedAt" type="datetime" placeholder="Please pick a date" />
+        <el-form-item label="Date" prop="updated_at">
+          <el-date-picker v-model="temp.updated_at" type="datetime" placeholder="Please pick a date" />
         </el-form-item>
         <el-form-item label="Localized Name" prop="localizedname">
           <el-input v-model="temp.localizedname" />
         </el-form-item>
-        <el-form-item label="Language ID" prop="languageId">
-          <el-input v-model="temp.languageId" />
+        <el-form-item label="Language ID" prop="language_id">
+          <el-input v-model="temp.language_id" />
         </el-form-item>
-        <el-form-item label="Small Thumbnail Path" prop="smallThumbnailPath">
-          <el-input v-model="temp.smallThumbnailPath" />
+        <el-form-item label="Small Thumbnail Path" prop="small_thumbnail_path">
+          <el-input v-model="temp.small_thumbnail_path" />
         </el-form-item>
-        <el-form-item label="Medium Thumbnail Path" prop="medThumbnailPath">
-          <el-input v-model="temp.medThumbnailPath" />
+        <el-form-item label="Medium Thumbnail Path" prop="med_thumbnail_path">
+          <el-input v-model="temp.med_thumbnail_path" />
         </el-form-item>
-        <el-form-item label="Large Thumbnail Path" prop="largeThumbnailPath">
-          <el-input v-model="temp.largeThumbnailPath" />
+        <el-form-item label="Large Thumbnail Path" prop="large_thumbnail_path">
+          <el-input v-model="temp.large_thumbnail_path" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -221,20 +234,17 @@ export default {
         type: undefined,
         sort: '+ordinal'
       },
-      importanceOptions: [1, 2, 3],
+      channels: [],
       channelOptions,
       calendarTypeOptions,
       sortOptions: [{ label: 'Ordinal Ascending', key: '+ordinal' }, { label: 'Ordinal Descending', key: '-ordinal' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        ordinal: undefined,
+        updated_at: new Date(),
+        localizedname: '',
+        media_category: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -245,38 +255,68 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
+        channel: [{ required: true, message: 'channel is required', trigger: 'blur' }],
         ordinal: [{ required: true, message: 'ordinal is required', trigger: 'blur' }],
-        mediaCategory: [{ required: true, message: 'media category is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        media_category: [{ required: true, message: 'media category is required', trigger: 'blur' }],
         localizedname: [{ required: true, message: 'title is required', trigger: 'blur' }],
-        languageId: [{ required: true, message: 'language id is required', trigger: 'blur' }]
+        language_id: [{ required: true, message: 'language id is required', trigger: 'blur' }]
       },
       downloadLoading: false
     }
   },
   created() {
-    this.getList()
+
+    var bibleChannelUuid = ''
+
+     axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50', 
+        // { params: { type: 'all', }, }
+        )
+        .then((res) => {
+          console.log('Success Response', res.data);
+          res.data.result.forEach((channel) => {
+            this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, updated_at: channel.updated_at });
+            console.log('this.channels', this.channels);
+            console.log('channel.basename', channel.basename);
+            if(channel.basename == 'Bible') {
+              console.log('found Bible');
+              bibleChannelUuid = channel.uuid
+              this.getList(bibleChannelUuid)
+            }
+          });
+        })
+        .catch((err) => {
+          console.log('Error', err);
+        });
+    console.log('bibleChannelUuid', bibleChannelUuid);
+    // this.getList()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      return axios.get(`http://localhost:4000/api/v1.3/channels/76202fe0-6923-4ac4-983c-94ac1892dc16/playlists?language-id=en&offset=1&limit=50`)
-        .then(response => {
-          console.log(response)
-          this.listLoading = false
-          this.list = response.data.result
-          this.total = response.data.totalEntries
+    getList(channelUuid) {
+      console.log(`getList: ${channelUuid}`);
+      if(channelUuid != null) {
+        this.listLoading = true
+        return axios.get(`http://localhost:4000/api/v1.3/channels/${channelUuid}/playlists?language-id=en&offset=1&limit=1000`)
+          .then(response => {
+            console.log(response)
+            this.listLoading = false
+            this.list = response.data.result
+            this.total = response.data.total_entries
+          })
+      }
+
+    },
+    handleSetChannel(channelUuid) {
+      console.log(`handleSetChannel: ${channelUuid}`);
+      // this.$ELEMENT.size = size
+      // this.$store.dispatch('app/setSize', size)
+      // this.refreshView()
+      if(channelUuid != null) {
+        this.getList(channelUuid)
+        this.$message({
+          message: 'Switch Size Success',
+          type: 'success'
         })
-
-      // fetchList(this.listQuery).then(response => {
-      //   this.list = response.data.items
-      //   this.total = response.data.total
-
-      //   // Just to simulate the time of the request
-      //   setTimeout(() => {
-      //     this.listLoading = false
-      //   }, 1.5 * 1000)
-      // })
+      }
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -305,13 +345,10 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        ordinal: undefined,
+        updated_at: new Date(),
+        localizedname: '',
+        media_category: ''
       }
     },
     handleCreate() {
@@ -342,7 +379,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.temp.updated_at = new Date(this.temp.updated_at)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -353,7 +390,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          tempData.updated_at = +new Date(tempData.updated_at) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           updateArticle(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -392,8 +429,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
+        const tHeader = ['updated_at', 'localizedname', 'media_category', 'importance', 'status']
+        const filterVal = ['updated_at', 'localizedname', 'media_category', 'importance', 'status']
         const data = this.formatJson(filterVal, this.list)
         excel.export_json_to_excel({
           header: tHeader,
@@ -405,7 +442,7 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
+        if (j === 'updated_at') {
           return parseTime(v[j])
         } else {
           return v[j]
