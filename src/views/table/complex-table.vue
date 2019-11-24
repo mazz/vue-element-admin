@@ -268,7 +268,6 @@ export default {
     }
   },
   created() {
-
     // show playlists from the bible channel as default
     var bibleChannelUuid = ''
 
