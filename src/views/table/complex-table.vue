@@ -104,10 +104,11 @@
     <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" /> -->
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:70px;">
         <el-form-item label="Channel" prop="channel">
           <el-select v-model="temp.channel_uuid" class="filter-item" placeholder="Please select">
             <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
+            <!-- <el-option v-for="item in channelOptions" :key="item.key" :label="item.key+'('+item.display_name+')'" :value="item.key" /> -->
           </el-select>
         </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
@@ -238,13 +239,15 @@ export default {
       channelOptions,
       calendarTypeOptions,
       sortOptions: [{ label: 'Ordinal Ascending', key: '+ordinal' }, { label: 'Ordinal Descending', key: '-ordinal' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
         ordinal: undefined,
+        channel_uuid: undefined,
         updated_at: new Date(),
         localizedname: '',
-        media_category: ''
+        media_category: '',
+        small_thumbnail_path: '',
+        med_thumbnail_path: '',
+        large_thumbnail_path: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -265,6 +268,8 @@ export default {
     }
   },
   created() {
+
+    // show playlists from the bible channel as default
     var bibleChannelUuid = ''
 
     axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50',
