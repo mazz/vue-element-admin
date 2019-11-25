@@ -22,7 +22,7 @@
       <!-- </el-select> -->
       <!-- <el-input v-model="listQuery.title" placeholder="Localized Name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
       <!-- <el-select v-model="listQuery.type" placeholder="Media Category" clearable class="filter-item" style="width: 130px"> -->
-      <!-- <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" /> -->
+      <!-- <el-option v-for="item in mediaCategoryOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" /> -->
       <!-- </el-select> -->
       <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter"> -->
       <!-- <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" /> -->
@@ -108,7 +108,6 @@
         <el-form-item label="Channel" prop="channel">
           <el-select v-model="temp.channel_uuid" class="filter-item" placeholder="Please select">
             <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
-            <!-- <el-option v-for="item in channelOptions" :key="item.key" :label="item.key+'('+item.display_name+')'" :value="item.key" /> -->
           </el-select>
         </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
@@ -116,7 +115,7 @@
         </el-form-item>
         <el-form-item label="Media Category" prop="media_category">
           <el-select v-model="temp.media_category" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in mediaCategoryOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="Date" prop="updated_at">
@@ -167,20 +166,7 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const channelOptions = [
-  { key: 'bible-uuid', display_name: 'Bible Channel' },
-  { key: 'gospel-uuid', display_name: 'Gospel Channel' },
-  { key: 'preaching-uuid', display_name: 'Preaching Channel' },
-  { key: 'musid-uuid', display_name: 'Music Channel' },
-  { key: 'movies-uuid', display_name: 'Movies Channel' }
-]
-
-const channelOptionsKeyValue = channelOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
-const calendarTypeOptions = [
+const mediaCategoryOptions = [
   { key: 'bible', display_name: 'Bible' },
   { key: 'gospel', display_name: 'Gospel' },
   { key: 'livestream', display_name: 'Livestream' },
@@ -196,7 +182,7 @@ const calendarTypeOptions = [
 ]
 
 // arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
+const calendarTypeKeyValue = mediaCategoryOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name
   return acc
 }, {})
@@ -216,9 +202,6 @@ export default {
     },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
-    },
-    channelFilter(option) {
-      return channelOptionsKeyValue[option]
     }
   },
   data() {
@@ -236,8 +219,7 @@ export default {
         sort: '+ordinal'
       },
       channels: [],
-      channelOptions,
-      calendarTypeOptions,
+      mediaCategoryOptions,
       sortOptions: [{ label: 'Ordinal Ascending', key: '+ordinal' }, { label: 'Ordinal Descending', key: '-ordinal' }],
       temp: {
         ordinal: undefined,
@@ -362,8 +344,15 @@ export default {
       })
     },
     createData() {
+      console.log('createData');
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          console.log(`valid, basename: ${this.temp.basename}`)
+          console.log(`valid, basename: ${this.temp.hash_id}`)
+          console.log(`valid, basename: ${this.temp.mediaCategoryOptions}`)
+          console.log(`valid, basename: ${this.temp.channelUuid}`)
+          console.log(`valid, basename: ${this.temp.basename}`)
+
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           this.temp.author = 'vue-element-admin'
           createArticle(this.temp).then(() => {
