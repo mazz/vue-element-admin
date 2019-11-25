@@ -344,7 +344,7 @@ export default {
       })
     },
     createData() {
-      console.log('createData');
+      console.log('createData')
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(`valid, basename: ${this.temp.basename}`)
