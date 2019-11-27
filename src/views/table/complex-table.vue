@@ -426,7 +426,7 @@ export default {
               // reset globals
               this.channels = []
               this.resetTemp()
-              
+
               this.getChannels()
               console.log(`response: ${response}`)
             })
