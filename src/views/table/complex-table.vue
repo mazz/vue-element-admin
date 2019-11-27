@@ -9,7 +9,7 @@
         </el-col>
       </div>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" :command="item.uuid">
+        <el-dropdown-item v-for="item in channels" :key="item.channel_id" :label="item.basename+'('+item.channel_id+')'" :value="item.channel_id" :command="item.channel_id">
           {{
             item.basename }}
         </el-dropdown-item>
@@ -58,10 +58,15 @@
           <span>{{ row.updated_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="Base Name" min-width="200px">
+        <template slot-scope="{row}">
+          <span class="link-type" @click="handleUpdate(row)">{{ row.basename }}</span>
+          <el-tag>{{ row.media_category | typeFilter }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="Localized Name" min-width="200px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.localizedname }}</span>
-          <el-tag>{{ row.media_category | typeFilter }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="Language ID" width="110px" align="center">
@@ -72,6 +77,11 @@
       <el-table-column label="Hash ID" width="110px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.hash_id }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Banner Path" min-width="150px">
+        <template slot-scope="{row}">
+          <span class="link-type" @click="handleUpdate(row)">{{ row.banner_path }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Small Thumbnail Path" min-width="150px">
@@ -106,8 +116,8 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:70px;">
         <el-form-item label="Channel" prop="channel">
-          <el-select v-model="temp.channel_uuid" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in channels" :key="item.uuid" :label="item.basename+'('+item.uuid+')'" :value="item.uuid" />
+          <el-select v-model="temp.channel_id" placeholder="Please select">
+            <el-option v-for="item in channels" :key="item.channel_id" :label="item.basename+'('+item.channel_id+')'" :value="item.channel_id" />
           </el-select>
         </el-form-item>
         <el-form-item label="Ordinal" prop="ordinal">
@@ -118,14 +128,20 @@
             <el-option v-for="item in mediaCategoryOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Date" prop="updated_at">
+        <!-- <el-form-item label="Date" prop="updated_at">
           <el-date-picker v-model="temp.updated_at" type="datetime" placeholder="Please pick a date" />
+        </el-form-item> -->
+        <el-form-item label="Basename" prop="basename">
+          <el-input v-model="temp.basename" />
         </el-form-item>
         <el-form-item label="Localized Name" prop="localizedname">
           <el-input v-model="temp.localizedname" />
         </el-form-item>
         <el-form-item label="Language ID" prop="language_id">
           <el-input v-model="temp.language_id" />
+        </el-form-item>
+        <el-form-item label="Banner Path" prop="banner_path">
+          <el-input v-model="temp.banner_path" />
         </el-form-item>
         <el-form-item label="Small Thumbnail Path" prop="small_thumbnail_path">
           <el-input v-model="temp.small_thumbnail_path" />
@@ -142,6 +158,7 @@
           Cancel
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <!-- <el-button @click="dialogStatus==='create'?createData():updateData()"> -->
           Confirm
         </el-button>
       </div>
@@ -161,6 +178,7 @@
 
 <script>
 import axios from 'axios'
+import { AxiosResponse, AxiosError } from 'axios'
 import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -222,14 +240,17 @@ export default {
       mediaCategoryOptions,
       sortOptions: [{ label: 'Ordinal Ascending', key: '+ordinal' }, { label: 'Ordinal Descending', key: '-ordinal' }],
       temp: {
-        ordinal: undefined,
-        channel_uuid: undefined,
+        channel_id: null,
+        ordinal: null,
         updated_at: new Date(),
-        localizedname: '',
-        media_category: '',
-        small_thumbnail_path: '',
-        med_thumbnail_path: '',
-        large_thumbnail_path: ''
+        basename: null,
+        localizedname: null,
+        language_id: null,
+        media_category: null,
+        banner_path: null,
+        small_thumbnail_path: null,
+        med_thumbnail_path: null,
+        large_thumbnail_path: null     
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -240,10 +261,11 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        channel: [{ required: true, message: 'channel is required', trigger: 'blur' }],
+        // channel: [{ required: true, message: 'channel is required', trigger: 'blur' }],
         ordinal: [{ required: true, message: 'ordinal is required', trigger: 'blur' }],
         media_category: [{ required: true, message: 'media category is required', trigger: 'blur' }],
-        localizedname: [{ required: true, message: 'title is required', trigger: 'blur' }],
+        basename: [{ required: true, message: 'basename is required', trigger: 'blur' }],
+        localizedname: [{ required: true, message: 'localizedname is required', trigger: 'blur' }],
         language_id: [{ required: true, message: 'language id is required', trigger: 'blur' }]
       },
       downloadLoading: false
@@ -259,7 +281,7 @@ export default {
       .then((res) => {
         console.log('Success Response', res.data)
         res.data.result.forEach((channel) => {
-          this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, updated_at: channel.updated_at })
+          this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, channel_id: channel.channel_id, updated_at: channel.updated_at })
           console.log('this.channels', this.channels)
           console.log('channel.basename', channel.basename)
           if (channel.basename == 'Bible') {
@@ -276,6 +298,9 @@ export default {
     // this.getList()
   },
   methods: {
+    isNumeric: function (n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    },
     getList(channelUuid) {
       console.log(`getList: ${channelUuid}`)
       if (channelUuid != null) {
@@ -329,10 +354,17 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        ordinal: undefined,
+        channel_id: null,
+        ordinal: null,
         updated_at: new Date(),
-        localizedname: '',
-        media_category: ''
+        basename: null,
+        localizedname: null,
+        language_id: null,
+        media_category: null,
+        banner_path: null,
+        small_thumbnail_path: null,
+        med_thumbnail_path: null,
+        large_thumbnail_path: null
       }
     },
     handleCreate() {
@@ -344,27 +376,76 @@ export default {
       })
     },
     createData() {
-      console.log('createData')
+      console.log('createData');
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log(`valid, basename: ${this.temp.basename}`)
-          console.log(`valid, basename: ${this.temp.hash_id}`)
-          console.log(`valid, basename: ${this.temp.mediaCategoryOptions}`)
-          console.log(`valid, basename: ${this.temp.channelUuid}`)
-          console.log(`valid, basename: ${this.temp.basename}`)
+          console.log(`valid, refs dataForm: ${this.$refs['dataForm']}`)
+          console.log(`valid, temp.ordinal: ${this.temp.ordinal}`)
+          console.log(`valid, temp.media_category: ${this.temp.media_category}`)
+          console.log(`valid, temp.updated_at: ${this.temp.updated_at}`)
+          console.log(`valid, temp.basename: ${this.temp.basename}`)
+          console.log(`valid, temp.localizedname: ${this.temp.localizedname}`)
+          console.log(`valid, temp.language_id: ${this.temp.language_id}`)
+          console.log(`valid, temp.channel_id: ${this.temp.channel_id}`)
+          console.log(`valid, temp.banner_path: ${this.temp.banner_path}`)
+          console.log(`valid, temp.small_thumbnail_path: ${this.temp.small_thumbnail_path}`)
+          console.log(`valid, temp.med_thumbnail_path: ${this.temp.med_thumbnail_path}`)
+          console.log(`valid, temp.large_thumbnail_path: ${this.temp.large_thumbnail_path}`)
 
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
+          var ordinal = Number(this.temp.ordinal)
+          var language_id = this.temp.language_id
+          console.log(`language_id: ${language_id}`);
+
+          const body = { data: {
+              ordinal: ordinal,
+              media_category: this.temp.media_category,
+              updated_at: this.temp.updated_at,
+              basename: this.temp.basename,
+              localized_titles: [{[this.temp.language_id]: this.temp.localizedname}],
+              channel_id: this.temp.channel_id,
+              banner_path: this.temp.banner_path,
+              small_thumbnail_path: this.temp.small_thumbnail_path,
+              med_thumbnail_path: this.temp.med_thumbnail_path,
+              large_thumbnail_path: this.temp.large_thumbnail_path
+          }}
+
+          axios.post('http://localhost:4000/api/v1.3/playlists/add', body)
+          // .then(function (response) {
+          .then( (response) => {
             this.$notify({
               title: 'Success',
-              message: 'Created Successfully',
+              message: 'Content submitted successfully',
               type: 'success',
               duration: 2000
             })
+            this.dialogFormVisible = false
+
+            console.log(`response: ${response}`);
           })
+          // .catch(function (error) {
+          .catch( (error) => {
+            this.$notify({
+              title: 'Error',
+              message: 'Please check the values you attempted to submit',
+              type: 'error',
+              duration: 2000
+            })
+            console.log(`error: ${error}`);
+          });
+
+
+          
+          // }
+
+          // createArticle(this.temp).then(() => {
+          //   this.list.unshift(this.temp)
+          //   this.$notify({
+          //     title: 'Success',
+          //     message: 'Created Successfully',
+          //     type: 'success',
+          //     duration: 2000
+          //   })
+          // })
         }
       })
     },
