@@ -9,7 +9,7 @@
         </el-col>
       </div>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item v-for="item in channels" :key="item.channel_id" :label="item.basename+'('+item.channel_id+')'" :value="item.channel_id" :command="item.channel_id">
+        <el-dropdown-item v-for="item in channels" :key="item.channel_uuid" :label="item.basename+'('+item.channel_id+')'" :value="item.channel_uuid" :command="item.channel_uuid">
           {{
             item.basename }}
         </el-dropdown-item>
@@ -272,40 +272,43 @@ export default {
     }
   },
   created() {
-    // show playlists from the bible channel as default
-    var bibleChannelUuid = ''
-
-    axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50',
-      // { params: { type: 'all', }, }
-    )
-      .then((res) => {
-        console.log('Success Response', res.data)
-        res.data.result.forEach((channel) => {
-          this.channels.push({ uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, channel_id: channel.channel_id, updated_at: channel.updated_at })
-          console.log('this.channels', this.channels)
-          console.log('channel.basename', channel.basename)
-          if (channel.basename == 'Bible') {
-            console.log('found Bible')
-            bibleChannelUuid = channel.uuid
-            this.getList(bibleChannelUuid)
-          }
-        })
-      })
-      .catch((err) => {
-        console.log('Error', err)
-      })
-    console.log('bibleChannelUuid', bibleChannelUuid)
-    // this.getList()
+    this.getChannels()
   },
   methods: {
     isNumeric: function(n) {
       return !isNaN(parseFloat(n)) && isFinite(n)
     },
-    getList(channelUuid) {
-      console.log(`getList: ${channelUuid}`)
-      if (channelUuid != null) {
+    getChannels() {
+      // show playlists from the bible channel as default
+      var bibleChannelUuid = ''
+
+      axios.get('http://localhost:4000/api/v1.3/orgs/64c1fa34-ebe9-425b-ae58-4815d933b01c/channels?language-id=en&offset=1&limit=50',
+        // { params: { type: 'all', }, }
+      )
+        .then((res) => {
+          console.log('Success Response', res.data)
+          res.data.result.forEach((channel) => {
+            this.channels.push({ channel_uuid: channel.uuid, basename: channel.basename, hash_id: channel.hash_id, channel_id: channel.channel_id, updated_at: channel.updated_at })
+            console.log('this.channels', this.channels)
+            console.log('channel.basename', channel.basename)
+            if (channel.basename == 'Bible') {
+              console.log('found Bible')
+              bibleChannelUuid = channel.uuid
+              this.getList(bibleChannelUuid)
+            }
+          })
+        })
+        .catch((err) => {
+          console.log('Error', err)
+        })
+      console.log('bibleChannelUuid', bibleChannelUuid)
+      // this.getList()
+    },
+    getList(channel_uuid) {
+      console.log(`getList: ${channel_uuid}`)
+      if (channel_uuid != null) {
         this.listLoading = true
-        return axios.get(`http://localhost:4000/api/v1.3/channels/${channelUuid}/playlists?language-id=en&offset=1&limit=1000`)
+        return axios.get(`http://localhost:4000/api/v1.3/channels/${channel_uuid}/playlists?language-id=en&offset=1&limit=1000`)
           .then(response => {
             console.log(response)
             this.listLoading = false
@@ -314,13 +317,13 @@ export default {
           })
       }
     },
-    handleSetChannel(channelUuid) {
-      console.log(`handleSetChannel: ${channelUuid}`)
+    handleSetChannel(channel_uuid) {
+      console.log(`handleSetChannel: ${channel_uuid}`)
       // this.$ELEMENT.size = size
       // this.$store.dispatch('app/setSize', size)
       // this.refreshView()
-      if (channelUuid != null) {
-        this.getList(channelUuid)
+      if (channel_uuid != null) {
+        this.getList(channel_uuid)
         this.$message({
           message: 'Switch Channel Success',
           type: 'success'
@@ -396,7 +399,7 @@ export default {
           var language_id = this.temp.language_id
           console.log(`language_id: ${language_id}`)
 
-          const body = { data: {
+          const body = {
             ordinal: ordinal,
             media_category: this.temp.media_category,
             updated_at: this.temp.updated_at,
@@ -407,7 +410,7 @@ export default {
             small_thumbnail_path: this.temp.small_thumbnail_path,
             med_thumbnail_path: this.temp.med_thumbnail_path,
             large_thumbnail_path: this.temp.large_thumbnail_path
-          }}
+          }
 
           axios.post('http://localhost:4000/api/v1.3/playlists/add', body)
           // .then(function (response) {
@@ -420,6 +423,11 @@ export default {
               })
               this.dialogFormVisible = false
 
+              // reset globals
+              this.channels = []
+              this.resetTemp()
+              
+              this.getChannels()
               console.log(`response: ${response}`)
             })
           // .catch(function (error) {
