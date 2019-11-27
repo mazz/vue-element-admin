@@ -158,7 +158,7 @@
           Cancel
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-        <!-- <el-button @click="dialogStatus==='create'?createData():updateData()"> -->
+          <!-- <el-button @click="dialogStatus==='create'?createData():updateData()"> -->
           Confirm
         </el-button>
       </div>
@@ -250,7 +250,7 @@ export default {
         banner_path: null,
         small_thumbnail_path: null,
         med_thumbnail_path: null,
-        large_thumbnail_path: null     
+        large_thumbnail_path: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -298,8 +298,8 @@ export default {
     // this.getList()
   },
   methods: {
-    isNumeric: function (n) {
-      return !isNaN(parseFloat(n)) && isFinite(n);
+    isNumeric: function(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n)
     },
     getList(channelUuid) {
       console.log(`getList: ${channelUuid}`)
@@ -376,7 +376,7 @@ export default {
       })
     },
     createData() {
-      console.log('createData');
+      console.log('createData')
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(`valid, refs dataForm: ${this.$refs['dataForm']}`)
@@ -394,47 +394,45 @@ export default {
 
           var ordinal = Number(this.temp.ordinal)
           var language_id = this.temp.language_id
-          console.log(`language_id: ${language_id}`);
+          console.log(`language_id: ${language_id}`)
 
           const body = { data: {
-              ordinal: ordinal,
-              media_category: this.temp.media_category,
-              updated_at: this.temp.updated_at,
-              basename: this.temp.basename,
-              localized_titles: [{[this.temp.language_id]: this.temp.localizedname}],
-              channel_id: this.temp.channel_id,
-              banner_path: this.temp.banner_path,
-              small_thumbnail_path: this.temp.small_thumbnail_path,
-              med_thumbnail_path: this.temp.med_thumbnail_path,
-              large_thumbnail_path: this.temp.large_thumbnail_path
+            ordinal: ordinal,
+            media_category: this.temp.media_category,
+            updated_at: this.temp.updated_at,
+            basename: this.temp.basename,
+            localized_titles: [{ [this.temp.language_id]: this.temp.localizedname }],
+            channel_id: this.temp.channel_id,
+            banner_path: this.temp.banner_path,
+            small_thumbnail_path: this.temp.small_thumbnail_path,
+            med_thumbnail_path: this.temp.med_thumbnail_path,
+            large_thumbnail_path: this.temp.large_thumbnail_path
           }}
 
           axios.post('http://localhost:4000/api/v1.3/playlists/add', body)
           // .then(function (response) {
-          .then( (response) => {
-            this.$notify({
-              title: 'Success',
-              message: 'Content submitted successfully',
-              type: 'success',
-              duration: 2000
-            })
-            this.dialogFormVisible = false
+            .then((response) => {
+              this.$notify({
+                title: 'Success',
+                message: 'Content submitted successfully',
+                type: 'success',
+                duration: 2000
+              })
+              this.dialogFormVisible = false
 
-            console.log(`response: ${response}`);
-          })
+              console.log(`response: ${response}`)
+            })
           // .catch(function (error) {
-          .catch( (error) => {
-            this.$notify({
-              title: 'Error',
-              message: 'Please check the values you attempted to submit',
-              type: 'error',
-              duration: 2000
+            .catch((error) => {
+              this.$notify({
+                title: 'Error',
+                message: 'Please check the values you attempted to submit',
+                type: 'error',
+                duration: 2000
+              })
+              console.log(`error: ${error}`)
             })
-            console.log(`error: ${error}`);
-          });
 
-
-          
           // }
 
           // createArticle(this.temp).then(() => {
