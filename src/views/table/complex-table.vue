@@ -206,42 +206,42 @@
         <el-table-column property="localizedTitle" label="Localized Title" />
       </el-table> -->
 
-    <el-table v-loading="listLoading" :data="addLocalizationTitleData" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="Localization" width="200">
-        <template slot-scope="{row}">
-          <span>{{ row.localization }}</span>
-        </template>
-      </el-table-column>
+      <el-table v-loading="listLoading" :data="addLocalizationTitleData" border fit highlight-current-row style="width: 100%">
+        <el-table-column align="center" label="Localization" width="200">
+          <template slot-scope="{row}">
+            <span>{{ row.localization }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column align="center" label="Localized Title">
-        <template slot-scope="{row}">
-          <span>{{ row.localizedTitle }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column align="center" label="Localized Title">
+          <template slot-scope="{row}">
+            <span>{{ row.localizedTitle }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column align="center" label="Actions" width="120">
-        <template slot-scope="{row}">
-          <el-button
-            v-if="row.edit"
-            type="success"
-            size="small"
-            icon="el-icon-circle-check-outline"
-            @click="confirmEdit(row)"
-          >
-            Ok
-          </el-button>
-          <el-button
-            v-else
-            type="primary"
-            size="small"
-            icon="el-icon-edit"
-            @click="row.edit=!row.edit"
-          >
-            Edit
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column align="center" label="Actions" width="120">
+          <template slot-scope="{row}">
+            <el-button
+              v-if="row.edit"
+              type="success"
+              size="small"
+              icon="el-icon-circle-check-outline"
+              @click="confirmEdit(row)"
+            >
+              Ok
+            </el-button>
+            <el-button
+              v-else
+              type="primary"
+              size="small"
+              icon="el-icon-edit"
+              @click="row.edit=!row.edit"
+            >
+              Edit
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
     </el-dialog>
   </div>
