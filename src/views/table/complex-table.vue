@@ -173,6 +173,41 @@
         <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
       </span>
     </el-dialog>
+
+    <el-button type="primary" @click="addLocalizationDialogVisible = true">
+    open a Drag Dialog
+    </el-button>
+
+    <el-dialog v-el-drag-dialog :visible.sync="addLocalizationDialogVisible" title="Add Localized Playlist Title" @dragDialog="handleDrag">
+      <el-form ref="addLocalizationForm" :rules="addLocalizationRules" :model="addLocalizationTemp" label-position="left" label-width="120px" style="width: 400px; margin-left:70px;">
+      
+      <!-- localized lang popover -->
+      <el-form-item label="Language" prop="addLocalizationValue">
+      <el-select ref="select" v-model="addLocalizationValue" placeholder="en">
+        <el-option v-for="item in languageOptions" :key="item.addLocalizationValue" :label="item.label" :value="item.addLocalizationValue" />
+      </el-select>
+      </el-form-item>
+
+      <!-- localized title field -->
+      <el-form-item label="Localized Title" prop="addingLocalizedTitle">
+        <el-input v-model="addingLocalizedTitle" />
+      </el-form-item>
+
+      <!-- add localization button -->
+      <el-form-item>
+      <el-button type="normal" @click="handleAddLocalizationTitle">
+      + Add Localized Title
+      </el-button>
+      </el-form-item>
+      </el-form>
+
+
+
+      <el-table :data="addLocalizationTitleData">
+        <el-table-column property="localization" label="Localization" width="200" />
+        <el-table-column property="localizedTitle" label="Localized Title" />
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -268,7 +303,28 @@ export default {
         localizedname: [{ required: true, message: 'localizedname is required', trigger: 'blur' }],
         language_id: [{ required: true, message: 'language id is required', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      addLocalizationDialogVisible: false,
+      languageOptions: [
+        { addLocalizationValue: 'en', label: 'en' },
+        { addLocalizationValue: 'el', label: 'el' },
+        { addLocalizationValue: 'es', label: 'es' },
+        { addLocalizationValue: 'fr', label: 'fr' },
+        { addLocalizationValue: 'hi', label: 'hi' },
+        { addLocalizationValue: 'hu', label: 'hu' },
+        { addLocalizationValue: 'nl', label: 'nl' },
+        { addLocalizationValue: 'ny', label: 'ny' },
+        { addLocalizationValue: 'pt', label: 'pt' }
+      ],
+      addLocalizationValue: 'en',
+      addingLocalizedTitle: '',
+      addLocalizationTitleData: [{
+        localization: 'en',
+        localizedTitle: 'The English Title'
+      }, {
+        localization: 'fr',
+        localizedTitle: 'Le French Title'
+      }]
     }
   },
   created() {
@@ -487,6 +543,10 @@ export default {
           })
         }
       })
+    },
+    handleAddLocalizationTitle() {
+      this.addLocalizationTitleData.push({ localization: this.addLocalizationValue, localizedTitle: this.addingLocalizedTitle })
+      console.log('this.addLocalizationTitleData', this.addLocalizationTitleData)
     },
     handleDelete(row) {
       this.$notify({
