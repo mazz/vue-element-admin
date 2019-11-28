@@ -175,33 +175,31 @@
     </el-dialog>
 
     <el-button type="primary" @click="addLocalizationDialogVisible = true">
-    open a Drag Dialog
+      open a Drag Dialog
     </el-button>
 
     <el-dialog v-el-drag-dialog :visible.sync="addLocalizationDialogVisible" title="Add Localized Playlist Title" @dragDialog="handleDrag">
       <el-form ref="addLocalizationForm" :rules="addLocalizationRules" :model="addLocalizationTemp" label-position="left" label-width="120px" style="width: 400px; margin-left:70px;">
-      
-      <!-- localized lang popover -->
-      <el-form-item label="Language" prop="addLocalizationValue">
-      <el-select ref="select" v-model="addLocalizationValue" placeholder="en">
-        <el-option v-for="item in languageOptions" :key="item.addLocalizationValue" :label="item.label" :value="item.addLocalizationValue" />
-      </el-select>
-      </el-form-item>
 
-      <!-- localized title field -->
-      <el-form-item label="Localized Title" prop="addingLocalizedTitle">
-        <el-input v-model="addingLocalizedTitle" />
-      </el-form-item>
+        <!-- localized lang popover -->
+        <el-form-item label="Language" prop="addLocalizationValue">
+          <el-select ref="select" v-model="addLocalizationValue" placeholder="en">
+            <el-option v-for="item in languageOptions" :key="item.addLocalizationValue" :label="item.label" :value="item.addLocalizationValue" />
+          </el-select>
+        </el-form-item>
 
-      <!-- add localization button -->
-      <el-form-item>
-      <el-button type="normal" @click="handleAddLocalizationTitle">
-      + Add Localized Title
-      </el-button>
-      </el-form-item>
+        <!-- localized title field -->
+        <el-form-item label="Localized Title" prop="addingLocalizedTitle">
+          <el-input v-model="addingLocalizedTitle" />
+        </el-form-item>
+
+        <!-- add localization button -->
+        <el-form-item>
+          <el-button type="normal" @click="handleAddLocalizationTitle">
+            + Add Localized Title
+          </el-button>
+        </el-form-item>
       </el-form>
-
-
 
       <el-table :data="addLocalizationTitleData">
         <el-table-column property="localization" label="Localization" width="200" />
