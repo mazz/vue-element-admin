@@ -178,7 +178,7 @@
       open a Drag Dialog
     </el-button>
 
-    <el-dialog v-el-drag-dialog :visible.sync="addLocalizationDialogVisible" title="Add Localized Playlist Title" @dragDialog="handleDrag">
+    <el-dialog :visible.sync="addLocalizationDialogVisible" title="Add Localized Playlist Title">
       <el-form ref="addLocalizationForm" :rules="addLocalizationRules" :model="addLocalizationTemp" label-position="left" label-width="120px" style="width: 400px; margin-left:70px;">
 
         <!-- localized lang popover -->
@@ -222,22 +222,11 @@
         <el-table-column align="center" label="Actions" width="120">
           <template slot-scope="{row}">
             <el-button
-              v-if="row.edit"
-              type="success"
-              size="small"
-              icon="el-icon-circle-check-outline"
-              @click="confirmEdit(row)"
-            >
-              Ok
-            </el-button>
-            <el-button
-              v-else
               type="primary"
               size="small"
-              icon="el-icon-edit"
-              @click="row.edit=!row.edit"
+              @click="confirmLocalizedRowDelete(row)"
             >
-              Edit
+              Delete
             </el-button>
           </template>
         </el-table-column>
@@ -360,7 +349,11 @@ export default {
       }, {
         localization: 'fr',
         localizedTitle: 'Le French Title'
-      }]
+      }],
+      addLocalizationTemp: {
+        addLocalizationValue: 'en',
+        addingLocalizedTitle: 'Sample Title'
+      },
     }
   },
   created() {
@@ -583,6 +576,15 @@ export default {
     handleAddLocalizationTitle() {
       this.addLocalizationTitleData.push({ localization: this.addLocalizationValue, localizedTitle: this.addingLocalizedTitle })
       console.log('this.addLocalizationTitleData', this.addLocalizationTitleData)
+    },
+    confirmLocalizedRowDelete(row) {
+      console.log('confirmLocalizedRowDelete', row)
+      this.$message({
+        message: 'The title has been deleted',
+        type: 'success'
+      })
+      const index = this.addLocalizationTitleData.indexOf(row)
+      this.addLocalizationTitleData.splice(index, 1)
     },
     handleDelete(row) {
       this.$notify({
