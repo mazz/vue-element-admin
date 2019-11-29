@@ -353,7 +353,7 @@ export default {
       addLocalizationTemp: {
         addLocalizationValue: 'en',
         addingLocalizedTitle: 'Sample Title'
-      },
+      }
     }
   },
   created() {
